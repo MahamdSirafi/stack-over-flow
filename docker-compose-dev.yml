@@ -1,0 +1,29 @@
+name: stack-over-flow
+services:
+  mongo:
+    image: mongo
+    container_name: stack-over-flow-mongodb
+    restart: always
+    volumes:
+      - stack-over-flow-DB:/data/db
+    ports:
+      - '27017:27017'
+
+  app:
+    container_name: app-container
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./src:/app/src:ro
+    env-file:
+      - ./.env
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+
+volumes:
+  stack-over-flow-DB:

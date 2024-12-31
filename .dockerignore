@@ -1,0 +1,20 @@
+# Version control
+.git/
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+
+# Documentation
+docs/
+
+# Configuration files
+.editorconfig
+.gitignore
+compose.yml
+compose.*.yml
+
+# Other
+.db/

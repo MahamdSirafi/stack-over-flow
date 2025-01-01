@@ -2,6 +2,7 @@ import { Response, ParsedRequest } from 'express';
 import {
   AuthFailureError,
   InternalError,
+  NoDataError,
   NotFoundError,
 } from '../core/ApiError';
 import asyncHandler from '../middlewares/asyncHandler';
@@ -19,7 +20,11 @@ import {
 import { defaultOrderParams } from '../utils/order';
 import { defaultPaginationParams } from '../utils/pagination';
 import { needRecord } from '../utils/record';
-
+import axios from 'axios';
+import { env_vars } from '../config';
+import Logger from '../core/Logger';
+import { Env } from '../utils/enum';
+import { answerRepository } from '../database/repositories/answer.repository';
 export class QuestionController {
   // Get all Questions by author
   public getQuestions = asyncHandler(
@@ -46,7 +51,6 @@ export class QuestionController {
     },
   );
 
-  // Get question by Id for authenticated user
   public getQuestion = asyncHandler(
     async (
       req: ParsedRequest<void, void, IQuestionIdSchema>,
@@ -60,19 +64,54 @@ export class QuestionController {
       res.ok({ message: 'success', data: question });
     },
   );
-
-  // Create question handler
+  public getOpenAIResponse = async (
+    question: string,
+  ): Promise<string | void> => {
+    try {
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: question }],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${env_vars.ai}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      return response.data.choices[0].message.content;
+    } catch (error) {
+      Logger.info(error);
+      new NoDataError('An error occurred while contacting OpenAI API');
+    }
+  };
   public createQuestion = asyncHandler(
     async (
       req: ParsedRequest<IQuestionCreateSchema>,
       res: Response,
       next: NextFunction,
     ): Promise<void> => {
-      console.log(req.user);
       const newQuestion = { ...req.valid.body, userId: req.user._id };
       const question = await questionRepository.insert(newQuestion);
       if (question === null) {
         throw new InternalError();
+      }
+      if ((env_vars.env = Env.production)) {
+        const answer = await this.getOpenAIResponse(`
+  Please provide a detailed answer to the following question:
+  **Title:** ${question.title}.
+  **Description:** ${question.description}.
+  **Additional Details:** ${question.details}.
+  Please elaborate on the problem described above in to parts ,the first for solution and the second for explain.`);
+        if (answer) {
+          const answerArr = answer.split('explain', 2);
+          await answerRepository.insert({
+            solution: answerArr[0],
+            explain: answerArr[1],
+          });
+        }
       }
       res.created({ message: 'Question has been created', data: question });
     },
@@ -139,5 +178,4 @@ export class QuestionController {
     },
   );
 }
-
 export const questionController = new QuestionController();

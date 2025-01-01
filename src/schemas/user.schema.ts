@@ -12,7 +12,6 @@ export type IUserIdSchema = TypeOf<typeof userIdSchema>;
 const userUpdateSchema = z
   .object({
     // <creating-property-update-schema />
-    status: z.nativeEnum(UserStatus).optional(),
     name: z.string().optional(),
     email: z.string().email().optional(),
   })

@@ -8,8 +8,6 @@ import {
   FindUserOptions,
   userRepository,
 } from '../database//repositories/user.repository';
-import { roleRepository } from '../database/repositories/role.repository';
-import { RoleCode } from '../utils/enum';
 import { ISignupSchema, ICredentialSchema } from '../schemas/auth.schema';
 import {
   IUserAllSchema,
@@ -36,15 +34,10 @@ export class UserController {
         new ConflictError('User already exist'),
       );
 
-      const role = await roleRepository.findOneBy({ code: RoleCode.USER });
-
-      if (!role) throw new InternalError('Role must be defined');
-
       const user = await userRepository.insert({
         name,
         email,
         password,
-        roleId: role.id,
       });
 
       const token = jwt.sign({ email: req.body.email }, env_vars.jwt.secret, {

@@ -34,7 +34,6 @@ export class UserRepository extends BaseRepository<IUser> {
       .find(query)
       .skip(pagination.pageSize * (pagination.page - 1))
       .limit(pagination.pageSize)
-      .populate('role')
       .sort({
         [order.column]: order.direction === OrderDirection.asc ? 1 : -1,
       });
@@ -51,25 +50,14 @@ export class UserRepository extends BaseRepository<IUser> {
   }
 
   async findPrivateProfileById(id: string): Promise<IUser | null> {
-    return await this.model
-      .findById(id)
-      .where({ deletedAt: null })
-      .populate({
-        path: 'role',
-        match: { status: true },
-        select: { code: 1 },
-      });
+    return await this.model.findById(id).where({ deletedAt: null });
   }
 
   async findOneById(id: string): Promise<IUser | null> {
     return await this.model
       .findById(id)
       .where({ deletedAt: null })
-      .select('+email +password +roleId')
-      .populate({
-        path: 'role',
-        match: { status: true },
-      });
+      .select('+email +password +roleId');
   }
 
   // find user by email
@@ -77,12 +65,7 @@ export class UserRepository extends BaseRepository<IUser> {
     return await this.model
       .findOne({ email: email })
       .where({ deletedAt: null })
-      .select('+email +password +roleId +name')
-      .populate({
-        path: 'role',
-        match: { status: true },
-        select: { code: 1 },
-      });
+      .select('+email +password +roleId +name');
   }
 }
 export const userRepository = new UserRepository();

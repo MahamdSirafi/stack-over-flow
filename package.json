@@ -14,10 +14,7 @@
     "add:property:document": "hygen property add-to-document",
     "postadd:property:document": "npm run format",
     "add:property:object": "hygen property add-to-object",
-    "postadd:property:object": "npm run format",
-    "add:roles": "node ./dist/data/import-dev-data.js --import",
-    "drop:roles": "node ./dist/data/import-dev-data.js --delete",
-    "seed:roles": "npm run drop:roles && npm run add:roles"
+    "postadd:property:object": "npm run format"
   },
   "dependencies": {
     "@types/bcrypt-nodejs": "0.0.30",

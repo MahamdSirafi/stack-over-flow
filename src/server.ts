@@ -1,3 +1,4 @@
+import { questionRoutes } from './routes/question.routes';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 import * as compression from 'compression';
@@ -23,6 +24,7 @@ class Server {
   }
 
   public routes(): void {
+    this.app.use('/api/v1/questions', questionRoutes.router);
     this.app.use('/api/v1/users', userRoutes.router);
     //ROUTES <dont remove this line>
     this.app.use(errHandler);
@@ -70,9 +72,7 @@ class Server {
 
   public start(): void {
     this.app.listen(this.app.get('port'), () => {
-      Logger.info(
-        `API is running at http://localhost: ${this.app.get('port')}`,
-      );
+      Logger.info(`API is running at http://localhost:${this.app.get('port')}`);
     });
   }
 }

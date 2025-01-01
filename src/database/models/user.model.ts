@@ -3,18 +3,17 @@ import { model, Schema, type Document as MongooseDocument } from 'mongoose';
 import { omit } from 'lodash';
 import { Error } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { IRole } from './role.model';
+// import { IRole } from './role.model';
 import { Types } from 'mongoose';
 
 export interface IUser extends MongooseDocument {
   id: string;
   // <creating-property-interface />
-  status?: UserStatus;
   name: string;
   email: string;
   password: string;
-  role: IRole;
-  roleId: IRole['_id'];
+  // role: IRole;
+  // roleId: IRole['_id'];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null | Date;
@@ -43,11 +42,11 @@ const userSchema = new Schema<IUser>(
       select: false,
       required: true,
     },
-    roleId: {
-      type: Types.ObjectId,
-      ref: 'Role',
-      required: true,
-    },
+    // roleId: {
+    //   type: Types.ObjectId,
+    //   ref: 'Role',
+    //   required: true,
+    // },
     deletedAt: {
       type: Date,
       default: null,
@@ -93,12 +92,5 @@ userSchema.methods.comparePassword = function (
     },
   );
 };
-
-userSchema.virtual('role', {
-  localField: 'roleId',
-  foreignField: '_id',
-  ref: 'Role',
-  justOne: true,
-});
 
 export default model<IUser>('User', userSchema);

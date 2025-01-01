@@ -3,7 +3,7 @@ import { IUser } from './user.model';
 import mongoose from 'mongoose';
 
 import { model, Schema, type Document as MongooseDocument } from 'mongoose';
-import { omit } from 'lodash';
+
 
 export interface IQuestion extends MongooseDocument {
   id: string;
@@ -28,17 +28,14 @@ const questionSchema: Schema = new Schema<IQuestion>(
     tags: [
       {
         type: String,
-        index: 'text',
       },
     ],
 
     description: {
       type: String,
-      index: 'text',
     },
     details: {
       type: String,
-      index: 'text',
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -47,7 +44,6 @@ const questionSchema: Schema = new Schema<IQuestion>(
 
     title: {
       type: String,
-      index: 'text',
     },
     deletedAt: {
       type: Date,
@@ -60,5 +56,14 @@ const questionSchema: Schema = new Schema<IQuestion>(
     versionKey: false,
   },
 );
-
+questionSchema.index(
+  { details: 'text', description: 'text', title: 'text' },
+  {
+    weights: {
+      title: 5,
+      description: 3,
+      details: 1,
+    },
+  },
+);
 export default model<IQuestion>('Question', questionSchema);

@@ -1,8 +1,6 @@
 import { IUser } from './user.model';
-
 import mongoose from 'mongoose';
 import { Query } from 'mongoose';
-
 import { model, Schema, type Document as MongooseDocument } from 'mongoose';
 
 export interface IQuestion extends MongooseDocument {
@@ -17,6 +15,10 @@ export interface IQuestion extends MongooseDocument {
   userId: IUser;
 
   title: string;
+
+  votes: number;
+
+  voters: string[];
 
   deletedAt: Date | null;
 }
@@ -44,6 +46,14 @@ const questionSchema: Schema = new Schema<IQuestion>(
     title: {
       type: String,
     },
+
+    votes: {
+      type: Number,
+      default: 0,
+    },
+
+    voters: Array,
+
     deletedAt: {
       type: Date,
       default: null,

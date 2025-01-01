@@ -8,6 +8,12 @@ const questionIdSchema = object({
 
 export type IQuestionIdSchema = TypeOf<typeof questionIdSchema>;
 
+const voteSchema = object({
+  vote: z.number().min(-1).max(1),
+});
+
+export type IVoteSchema = TypeOf<typeof voteSchema>;
+
 const questionAllSchema = object({
   page,
   pageSize,
@@ -51,6 +57,7 @@ const questionUpdateSchema = object({
 export type IQuestionUpdateSchema = TypeOf<typeof questionUpdateSchema>;
 
 export default {
+  vote: voteSchema,
   questionId: questionIdSchema,
   questionAll: questionAllSchema,
   questionCreate: questionCreateSchema,

@@ -7,6 +7,12 @@ const answerIdSchema = object({
 
 export type IAnswerIdSchema = TypeOf<typeof answerIdSchema>;
 
+const voteSchema = object({
+  vote: z.number().min(-1).max(1),
+});
+
+export type IVoteSchema = TypeOf<typeof voteSchema>;
+
 const questionIdSchema = object({
   questionId: zodObjectId,
 });
@@ -34,6 +40,7 @@ const answerUpdateSchema = object({
 export type IAnswerUpdateSchema = TypeOf<typeof answerUpdateSchema>;
 
 export default {
+  vote: voteSchema,
   answerId: answerIdSchema,
   answerCreate: answerCreateSchema,
   answerUpdate: answerUpdateSchema,

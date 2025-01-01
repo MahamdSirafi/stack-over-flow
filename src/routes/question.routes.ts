@@ -63,6 +63,18 @@ export class QuestionRoutes {
       validator({ params: questionSchema.questionId }),
       questionController.deleteQuestion,
     );
+
+    this.router.patch(
+      '/:id/vote',
+      validator({ headers: authSchema.auth }),
+      authController.authenticateJWT,
+      authorizationMiddleware.authorization,
+      validator({
+        params: questionSchema.questionId,
+        body: questionSchema.vote,
+      }),
+      questionController.updateVoteQuestion,
+    );
   }
 }
 

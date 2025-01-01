@@ -19,6 +19,10 @@ export interface IAnswer extends MongooseDocument {
 
   explain: string;
 
+  votes: number;
+
+  voters: string[];
+
   deletedAt: Date | null;
 }
 
@@ -41,6 +45,14 @@ const answerSchema: Schema = new Schema<IAnswer>(
     explain: {
       type: String,
     },
+
+    votes: {
+      type: Number,
+      default: 0,
+    },
+
+    voters: Array,
+
     deletedAt: {
       type: Date,
       default: null,
@@ -49,6 +61,7 @@ const answerSchema: Schema = new Schema<IAnswer>(
   {
     collection: 'Answer',
     timestamps: true,
+    versionKey: false,
   },
 );
 answerSchema.pre<Query<IAnswer, IAnswer>>(/^find/, function (next) {

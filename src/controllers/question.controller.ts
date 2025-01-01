@@ -118,6 +118,26 @@ export class QuestionController {
       res.noContent({ message: 'Question deleted successfully' });
     },
   );
+
+  public updateVoteQuestion = asyncHandler(
+    async (
+      req: ParsedRequest<void, void, IQuestionIdSchema>,
+      res: Response,
+    ): Promise<void> => {
+      const question = needRecord(
+        await questionRepository.findById(req.valid.params.id),
+        new NotFoundError('Question not found'),
+      );
+
+      if (question.voters.includes(req.user._id.toString()))
+        throw new AuthFailureError('you have a vote');
+
+      req.body.vote == '1' ? question.votes++ : question.votes--;
+      question.voters.push(req.user._id.toString());
+      await question.save();
+      res.ok({ message: 'Question has been updated', data: question });
+    },
+  );
 }
 
 export const questionController = new QuestionController();

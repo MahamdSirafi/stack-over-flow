@@ -102,6 +102,25 @@ export class AnswerController {
       res.noContent({ message: 'Answer deleted successfully' });
     },
   );
+
+  public updateVoteAnswer = asyncHandler(
+    async (
+      req: ParsedRequest<void, void, IAnswerIdSchema>,
+      res: Response,
+    ): Promise<void> => {
+      const answer = needRecord(
+        await answerRepository.findById(req.valid.params.id),
+        new NotFoundError('Answer not found'),
+      );
+      if (answer.voters.includes(req.user._id.toString()))
+        throw new AuthFailureError('you have a vote');
+
+      req.body.vote == '1' ? answer.votes++ : answer.votes--;
+      answer.voters.push(req.user._id.toString());
+      await answer.save();
+      res.ok({ message: 'Answer has been updated', data: answer });
+    },
+  );
 }
 
 export const answerController = new AnswerController();

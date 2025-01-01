@@ -91,7 +91,7 @@ export class QuestionController {
         await questionRepository.findById(req.valid.params.id),
         new NotFoundError('Question not found'),
       );
-      if (!req.user._id.equals(question.userId))
+      if (!req.user._id.equals(question.userId._id))
         throw new AuthFailureError('Permission denied');
 
       const data = await questionRepository.patchById(question.id, updateBody);
@@ -111,7 +111,7 @@ export class QuestionController {
         new NotFoundError('Question not found'),
       );
 
-      if (!req.user._id.equals(question.userId))
+      if (!req.user._id.equals(question.userId._id))
         throw new AuthFailureError('Permission denied');
 
       await questionRepository.deleteById(question.id);

@@ -41,8 +41,7 @@ export class QuestionRepository extends BaseRepository<IQuestion> {
         [order.column]: order.direction === OrderDirection.asc ? 1 : -1,
       })
       .limit(pagination.pageSize)
-      .skip(--pagination.page * pagination.pageSize)
-      .populate({ path: 'userId', select: 'name' });
+      .skip(--pagination.page * pagination.pageSize);
     return { results, total };
   }
 }

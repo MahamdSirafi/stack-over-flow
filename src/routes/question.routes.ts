@@ -5,7 +5,7 @@ import { authorizationMiddleware } from '../auth/authorization';
 import { questionController } from '../controllers/question.controller';
 import authSchema from '../schemas/auth.schema';
 import { authController } from '../controllers/auth.controller';
-
+import { answerRoutes } from './answer.routes';
 export class QuestionRoutes {
   public router: Router;
 
@@ -15,16 +15,11 @@ export class QuestionRoutes {
   }
 
   routes() {
-    // PROTECTED ROUTES
-    this.router.use(
-      validator({ headers: authSchema.auth }),
-      authController.authenticateJWT,
-    );
+    this.router.use('/:questionId/answers', answerRoutes.router);
 
     // GET ALL QUESTIONS
     this.router.get(
       '/',
-      authorizationMiddleware.authorization,
       validator({ query: questionSchema.questionAll }),
       questionController.getQuestions,
     );
@@ -32,7 +27,6 @@ export class QuestionRoutes {
     // GET QUESTION BY ID
     this.router.get(
       '/:id',
-      authorizationMiddleware.authorization,
       validator({ params: questionSchema.questionId }),
       questionController.getQuestion,
     );
@@ -40,6 +34,8 @@ export class QuestionRoutes {
     // CREATE QUESTION
     this.router.post(
       '/',
+      validator({ headers: authSchema.auth }),
+      authController.authenticateJWT,
       authorizationMiddleware.authorization,
       validator({ body: questionSchema.questionCreate }),
       questionController.createQuestion,
@@ -48,6 +44,8 @@ export class QuestionRoutes {
     // UPDATE QUESTION BY ID
     this.router.patch(
       '/:id',
+      validator({ headers: authSchema.auth }),
+      authController.authenticateJWT,
       authorizationMiddleware.authorization,
       validator({
         params: questionSchema.questionId,
@@ -59,6 +57,8 @@ export class QuestionRoutes {
     // DELETE QUESTION BY ID
     this.router.delete(
       '/:id',
+      validator({ headers: authSchema.auth }),
+      authController.authenticateJWT,
       authorizationMiddleware.authorization,
       validator({ params: questionSchema.questionId }),
       questionController.deleteQuestion,

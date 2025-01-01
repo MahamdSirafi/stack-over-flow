@@ -1,9 +1,9 @@
 import { IUser } from './user.model';
 
 import mongoose from 'mongoose';
+import { Query } from 'mongoose';
 
 import { model, Schema, type Document as MongooseDocument } from 'mongoose';
-
 
 export interface IQuestion extends MongooseDocument {
   id: string;
@@ -14,8 +14,7 @@ export interface IQuestion extends MongooseDocument {
 
   details: string;
 
-  userId: IUser['_id'];
-  user: IUser;
+  userId: IUser;
 
   title: string;
 
@@ -66,4 +65,12 @@ questionSchema.index(
     },
   },
 );
+questionSchema.pre<Query<IQuestion, IQuestion>>(/^find/, function (next) {
+  this.populate({
+    path: 'userId',
+    select: 'name',
+  });
+
+  next();
+});
 export default model<IQuestion>('Question', questionSchema);

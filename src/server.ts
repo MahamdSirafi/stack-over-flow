@@ -1,3 +1,4 @@
+import { editRequestRoutes } from './routes/edit-request.routes';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 import * as compression from 'compression';
@@ -11,6 +12,7 @@ import * as passport from 'passport';
 import errHandler from './middlewares/errHandler';
 import customResponses from './middlewares/custom.middleware';
 import Logger from './core/Logger';
+import { NotFoundError } from './core/ApiError';
 
 class Server {
   public app: express.Application;
@@ -24,9 +26,15 @@ class Server {
   }
 
   public routes(): void {
+    this.app.use('/api/v1/edit-requests', editRequestRoutes.router);
+
     this.app.use('/api/v1/questions', questionRoutes.router);
     this.app.use('/api/v1/users', userRoutes.router);
     //ROUTES <dont remove this line>
+    this.app.all('*', (req, res, next) => {
+      Logger.info(`Can't find ${req.originalUrl} on this server!`);
+      next(new NotFoundError(`Can't find ${req.originalUrl} on this server!`));
+    });
     this.app.use(errHandler);
   }
 

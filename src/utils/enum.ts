@@ -17,3 +17,13 @@ export enum Env {
   test = 'test',
 }
 // <creating-enum-type />
+export enum RequestStatus {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
+}
+
+export enum Item {
+  question = 'question',
+  answer = 'answer',
+}

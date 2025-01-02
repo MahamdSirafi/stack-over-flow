@@ -26,6 +26,7 @@ import Logger from '../core/Logger';
 import { Env } from '../utils/enum';
 import { answerRepository } from '../database/repositories/answer.repository';
 import { TfIdf } from 'natural';
+import { getOpenAIResponse } from '../openAI';
 
 export class QuestionController {
   // Get all Questions by author
@@ -66,29 +67,7 @@ export class QuestionController {
       res.ok({ message: 'success', data: question });
     },
   );
-  public getOpenAIResponse = async (
-    question: string,
-  ): Promise<string | void> => {
-    try {
-      const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: question }],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${env_vars.ai}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      return response.data.choices[0].message.content;
-    } catch (error) {
-      Logger.info(error);
-      new NoDataError('An error occurred while contacting OpenAI API');
-    }
-  };
+
   public createQuestion = asyncHandler(
     async (
       req: ParsedRequest<IQuestionCreateSchema>,
@@ -100,20 +79,9 @@ export class QuestionController {
       if (question === null) {
         throw new InternalError();
       }
-      if ((env_vars.env = Env.production)) {
-        const answer = await this.getOpenAIResponse(`
-  Please provide a detailed answer to the following question:
-  **Title:** ${question.title}.
-  **Description:** ${question.description}.
-  **Additional Details:** ${question.details}.
-  Please elaborate on the problem described above in to parts ,the first for solution and the second for explain.`);
-        if (answer) {
-          const answerArr = answer.split('explain', 2);
-          await answerRepository.insert({
-            solution: answerArr[0],
-            explain: answerArr[1],
-          });
-        }
+      const answer = await getOpenAIResponse(question);
+      if (answer) {
+        await answerRepository.insert(answer);
       }
       res.created({ message: 'Question has been created', data: question });
     },

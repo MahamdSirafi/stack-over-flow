@@ -2,7 +2,7 @@ import { IUser } from './user.model';
 import mongoose from 'mongoose';
 import { Query } from 'mongoose';
 import { model, Schema, type Document as MongooseDocument } from 'mongoose';
-
+import { Tokenizer, TfIdf } from 'natural';
 export interface IQuestion extends MongooseDocument {
   id: string;
   // <creating-property-interface />
@@ -19,6 +19,8 @@ export interface IQuestion extends MongooseDocument {
   votes: number;
 
   voters: string[];
+
+  vector: number[];
 
   deletedAt: Date | null;
 }
@@ -54,6 +56,8 @@ const questionSchema: Schema = new Schema<IQuestion>(
 
     voters: Array,
 
+    vector: { type: [Number] },
+
     deletedAt: {
       type: Date,
       default: null,
@@ -75,6 +79,20 @@ questionSchema.index(
     },
   },
 );
+
+const tfidf = new TfIdf();
+
+questionSchema.pre('save', function (next) {
+  const text = this.title + ' ' + this.description + ' ' + this.details;
+  
+  tfidf.addDocument(text);
+  
+  const vector = tfidf.listTerms(0).map(term => term.tfidf);
+  
+  this.vector = vector;
+  next();
+});
+
 questionSchema.pre<Query<IQuestion, IQuestion>>(/^find/, function (next) {
   this.populate({
     path: 'userId',

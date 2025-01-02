@@ -25,6 +25,8 @@ import { env_vars } from '../config';
 import Logger from '../core/Logger';
 import { Env } from '../utils/enum';
 import { answerRepository } from '../database/repositories/answer.repository';
+import { TfIdf } from 'natural';
+
 export class QuestionController {
   // Get all Questions by author
   public getQuestions = asyncHandler(
@@ -177,5 +179,56 @@ export class QuestionController {
       res.ok({ message: 'Question has been updated', data: question });
     },
   );
+
+  public getQuestionSimilar = asyncHandler(
+    async (
+      req: ParsedRequest<void, IQuestionAllSchema>,
+      res: Response,
+    ): Promise<void> => {
+      const question = await this.findSimilarQuestions(
+        req.valid.query.search as string,
+      );
+
+      res.ok({
+        message: 'success',
+        data: { results: question, total: question.length },
+      });
+    },
+  );
+
+  public findSimilarQuestions = async (inputText: string) => {
+    const tfidfInput = new TfIdf();
+    tfidfInput.addDocument(inputText);
+
+    const inputVector = tfidfInput.listTerms(0).map((term) => term.tfidf);
+
+    const questions = await questionRepository.findAll();
+
+    const similarQuestions = questions
+      .map((question) => {
+        const similarity = this.calculateCosineSimilarity(
+          inputVector,
+          question.vector,
+        );
+        return { question, similarity };
+      })
+      .sort((a, b) => b.similarity - a.similarity);
+
+    return similarQuestions.slice(0, 5);
+  };
+
+  public calculateCosineSimilarity = (
+    vecA: number[],
+    vecB: number[],
+  ): number => {
+    const dotProduct = vecA.reduce(
+      (sum, val, i) => sum + val * (vecB[i] || 0),
+      0,
+    );
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
+
+    return dotProduct / (magnitudeA * magnitudeB);
+  };
 }
 export const questionController = new QuestionController();

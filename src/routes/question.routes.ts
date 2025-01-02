@@ -24,6 +24,12 @@ export class QuestionRoutes {
       questionController.getQuestions,
     );
 
+    this.router.get(
+      '/similar',
+      validator({ query: questionSchema.questionAll }),
+      questionController.getQuestionSimilar,
+    );
+
     // GET QUESTION BY ID
     this.router.get(
       '/:id',

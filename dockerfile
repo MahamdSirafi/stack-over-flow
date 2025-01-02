@@ -6,8 +6,8 @@ COPY package.json /app
 RUN npm install
 COPY . .
 EXPOSE 3000
-CMD ["npm","run","build"]
-CMD ["npm","start"]
+RUN npm run watch
+CMD ["npm"و "start"] 
 
 FROM base as production
 WORKDIR /app
@@ -15,6 +15,5 @@ COPY package.json /app
 RUN npm install --only=production
 COPY . .
 EXPOSE 3000
-CMD ["npm","run","watch"]
-CMD ["npm","run","start:prod"]
-
+RUN npm run build
+CMD ["npm","run","start:prod"] 

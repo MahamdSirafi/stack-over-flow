@@ -1,19 +1,24 @@
-# Tasks Manager
+# Stack Overflow Project
 
-Tasks Manager is a Node.js application built with Express.js, MongoDB, Passport.js, and JWT authentication. It provides endpoints for managing tasks and user authentication.
+Stack Overflow Project is a Node.js application built with Express.js, MongoDB, Passport.js, and JWT authentication.
+
+## Requirements
+
+• Docker
+
+• Docker Compose
 
 ## Setup Instructions
 
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/
+   git clone https://github.com/MahamdSirafi/stack-over-flow.git
    ```
 
 2. **Install Dependencies**
 
    ```bash
-   cd 
    npm  install
    ```
 
@@ -34,78 +39,48 @@ Tasks Manager is a Node.js application built with Express.js, MongoDB, Passport.
      MONGODB_URI=your_mongodb_connection_string
      JWT_SECRET=your_jwt_secret_key
      JWT_ACCESS_EXPIRATION=jwt_expire_time
+     LOG_DIR=./logs
+     OPENAI_API_KEY=12d1d24d1s1d21dc12d12dd1d
      ```
 
-5. **Seed the Roles**
-
-   ```bash
-   npm run seed:roles
-   ```
-
-6. **Run the Application**
+5. **Run the Application**
 
 ```bash
 npm run build
 npm start
 ```
 
+or
+
+```bash
+npm run build
+npm start
+```
+
+5. **Run the Application with docker**
+   To run the project in a production environment, use the following command:
+
+```bash
+docker-compose -f docker-compose-prod.yml up --build
+```
+
+To run the project in a development environment, use the following command:
+
+```bash
+docker-compose -f docker-compose-dev.yml up --build
+```
 
 ## API Endpoints
 
-### Authentication
+### API Documentation
 
-- **Register User**
+The API documentation for this project is available in the stack_overflow.postman_collection.json file located in the root directory of the project. This file contains a collection of all the API endpoints, including their descriptions, request methods, parameters, and example responses.
 
-  - URL: /api/v1/users/register
-  - Method: POST
-  - Request Body:
+To explore the API documentation:
 
-  ```json
-  {
-    "email": "example@example.com",
-    "password": "password",
-    "name": "John Doe"
-  }
-  ```
-
-  - Response:
-
-    ```json
-    {
-      "token": "your_jwt_token",
-      "user": {
-        "_id": "user_id",
-        "name": "John Doe",
-        "email": "example@example.com"
-      }
-    }
-    ```
-
-- **Login User**
-
-  - URL: /api/v1/users/login
-  - Method: POST
-  - Request Body:
-
-    ```json
-    {
-      "email": "example@example.com",
-      "password": "password"
-    }
-    ```
-
-  - Response:
-
-    ```json
-    {
-      "token": "your_jwt_token",
-      "user": {
-        "_id": "user_id",
-        "name": "John Doe",
-        "email": "example@example.com"
-      }
-    }
-    ```
+1. Open Postman.
+2. Import the stack_overflow.postman_collection.json file.
+3. You will find all the available API endpoints organized for easy navigation.
 
 ## License
 
